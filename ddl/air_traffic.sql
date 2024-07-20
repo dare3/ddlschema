@@ -7,52 +7,53 @@ CREATE DATABASE air_traffic;
 
 \c air_traffic
 
-CREATE TABLE tickets
+CREATE TABLE airlines
 (
-  id SERIAL PRIMARY KEY,
+  airline_id SERIAL PRIMARY KEY,
+  airline_name TEXT NOT NULL
+);
+
+CREATE TABLE countries
+(
+  countries_id SERIAL PRIMARY KEY,
+  country_name TEXT NOT NULL
+);
+
+CREATE TABLE cities
+(
+  cities_id SERIAL PRIMARY KEY,
+  city_name TEXT NOT NULL
+);
+
+CREATE TABLE flights
+(
+  flight_id SERIAL PRIMARY KEY,
+  departure TIMESTAMP,
+  arrival TIMESTAMP,
+  airline_id INT,
+  from_country_id INT,
+  to_country_id INT,
+  from_city_id INT,
+  to_city_id INT,
+  FOREIGN KEY (airline_id) REFERENCES airlines(airline_id),
+  FOREIGN KEY (from_country_id) REFERENCES countries(countries_id),
+  FOREIGN KEY (to_country_id) REFERENCES countries(countries_id),
+  FOREIGN KEY (from_city_id) REFERENCES cities(cities_id),
+  FOREIGN KEY (to_city_id) REFERENCES cities(cities_id)
+);
+
+CREATE TABLE passengers
+(
+  passenger_id SERIAL PRIMARY KEY,
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
-  seat TEXT NOT NULL,
-  departure TIMESTAMP NOT NULL,
-  arrival TIMESTAMP NOT NULL,
-  airline TEXT NOT NULL,
-  from_city TEXT NOT NULL,
-  from_country TEXT NOT NULL,
-  to_city TEXT NOT NULL,
-  to_country TEXT NOT NULL,
-  FOREIGN KEY (from_city_id) REFERENCES cities (city_id),
-  FOREIGN KEY (to_city_id) REFERENCES cities (city_id),
-  FOREIGN KEY (country_id) REFERENCES countries (country_id),
-   FOREIGN KEY (to_country_id) REFERENCES countries(countries_id)
+  seat varchar(3) NOT NULL,
+  flight_id INT,
+  FOREIGN KEY (flight_id) REFERENCES flights(flight_id)
 );
 
 
-
-INSERT INTO tickets
-  (first_name, last_name, seat, departure, arrival, airline, from_city, from_country, to_city, to_country)
-VALUES
-  ('Jennifer', 'Finch', '33B', '2018-04-08 09:00:00', '2018-04-08 12:00:00', 'United', 'Washington DC', 'United States', 'Seattle', 'United States'),
-  ('Thadeus', 'Gathercoal', '8A', '2018-12-19 12:45:00', '2018-12-19 16:15:00', 'British Airways', 'Tokyo', 'Japan', 'London', 'United Kingdom'),
-  ('Sonja', 'Pauley', '12F', '2018-01-02 07:00:00', '2018-01-02 08:03:00', 'Delta', 'Los Angeles', 'United States', 'Las Vegas', 'United States'),
-  ('Jennifer', 'Finch', '20A', '2018-04-15 16:50:00', '2018-04-15 21:00:00', 'Delta', 'Seattle', 'United States', 'Mexico City', 'Mexico'),
-  ('Waneta', 'Skeleton', '23D', '2018-08-01 18:30:00', '2018-08-01 21:50:00', 'TUI Fly Belgium', 'Paris', 'France', 'Casablanca', 'Morocco'),
-  ('Thadeus', 'Gathercoal', '18C', '2018-10-31 01:15:00', '2018-10-31 12:55:00', 'Air China', 'Dubai', 'UAE', 'Beijing', 'China'),
-  ('Berkie', 'Wycliff', '9E', '2019-02-06 06:00:00', '2019-02-06 07:47:00', 'United', 'New York', 'United States', 'Charlotte', 'United States'),
-  ('Alvin', 'Leathes', '1A', '2018-12-22 14:42:00', '2018-12-22 15:56:00', 'American Airlines', 'Cedar Rapids', 'United States', 'Chicago', 'United States'),
-  ('Berkie', 'Wycliff', '32B', '2019-02-06 16:28:00', '2019-02-06 19:18:00', 'American Airlines', 'Charlotte', 'United States', 'New Orleans', 'United States'),
-  ('Cory', 'Squibbes', '10D', '2019-01-20 19:30:00', '2019-01-20 22:45:00', 'Avianca Brasil', 'Sao Paolo', 'Brazil', 'Santiago', 'Chile');
-
-
-
-
-
-CREATE TABLE countries (
-    country_id SERIAL PRIMARY KEY,
-    country_name TEXT NOT NULL UNIQUE
-);
-
-
-   -- Insert data into the tables
+-- Insert data into the tables
 INSERT INTO 
   countries (country_name) 
 VALUES 
@@ -67,15 +68,6 @@ VALUES
   ('Brazil'), 
   ('Chile');
 
-
-CREATE TABLE cities (
-    city_id SERIAL PRIMARY KEY,
-    city_name TEXT NOT NULL,
-   --country_id BIGINT NOT NULL,
-    --FOREIGN KEY (country_id) REFERENCES countries (country_id),
-    --UNIQUE (city_name, country_id) -- Ensure unique city names within each country
-);
-  
 INSERT INTO 
   cities (city_name) 
 VALUES 
@@ -97,3 +89,45 @@ VALUES
   ('New Orleans'),
   ('Mexico City'),
   ('Chicago');
+
+INSERT INTO 
+  airlines (airline_name) 
+VALUES 
+  ('United'),
+  ('British Airways'), 
+  ('Delta'), 
+  ('TUI Fly Belgium'),
+  ('Air China'), 
+  ('American Airlines'), 
+  ('Avianca Brasil');
+
+
+
+
+INSERT INTO 
+  flights (departure, arrival, airline_id, from_country_id, to_country_id, from_city_id, to_city_id) 
+VALUES 
+  ('2018-04-08 09:00:00', '2018-04-08 12:00:00', 1, 1, 1, 1, 2),
+  ('2018-12-19 12:45:00', '2018-12-19 16:15:00', 2, 3, 2, 3, 4),
+  ('2018-01-02 07:00:00', '2018-01-02 08:03:00', 3, 1, 1, 5, 6),
+  ('2018-04-15 16:50:00', '2018-04-15 21:00:00', 3, 1, 4, 2, 17),
+  ('2018-08-01 18:30:00', '2018-08-01 21:50:00', 4, 5, 6, 7, 8),
+  ('2018-10-31 01:15:00', '2018-10-31 12:55:00', 5, 7, 8, 9, 10),
+  ('2019-02-06 06:00:00', '2019-02-06 07:47:00', 1, 1, 1, 11, 12),
+  ('2018-12-22 14:42:00', '2018-12-22 15:56:00', 6, 1, 1, 13, 18),
+  ('2019-02-06 16:28:00', '2019-02-06 19:18:00', 6, 1, 1, 12, 16),
+  ('2019-01-20 19:30:00', '2019-01-20 22:45:00', 7, 9, 10, 14, 15);
+
+INSERT INTO 
+  passengers (first_name, last_name, seat, flight_id) 
+VALUES 
+  ('Jennifer', 'Finch', '33B', 1),
+  ('Thadeus', 'Gathercoal', '8A', 2),
+  ('Sonja', 'Pauley', '12F', 3),
+  ('Jennifer', 'Finch', '20A', 4),
+  ('Waneta', 'Skeleton', '23D', 5),
+  ('Thadeus', 'Gathercoal', '18C', 6),
+  ('Berkie', 'Wycliff', '9E', 7),
+  ('Alvin', 'Leathes', '1A', 8),
+  ('Berkie', 'Wycliff', '32B', 9),
+  ('Cory', 'Squibbes', '10D', 10);
